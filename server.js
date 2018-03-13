@@ -10,9 +10,9 @@ var schedule = require('node-schedule');
 
 const xkcdUrl = 'https://xkcd.com/info.0.json';
 
-var latestIndex = 0;
+var latestIndex = 1966;
 
-var j = schedule.scheduleJob('* */2 * * *', function() {
+var j = schedule.scheduleJob('*/15 * * * *', function() {
         console.log("send request, current index is " + latestIndex);
         request(xkcdUrl, function(error, response, body) {
                 var comics = JSON.parse(body)
@@ -39,10 +39,6 @@ var sendNotification = function(xkcd) {
 	    collapse_key: 'new_comics',
 	    data: {
 	        xkcd: xkcd
-	    },
-	    notification: {
-	        title: 'New Xkcd comic coming',
-	        body: xkcd.num + '-' + xkcd.title
 	    },
 	    android: {
 		ttl: "172800s"
