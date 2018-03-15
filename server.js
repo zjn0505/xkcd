@@ -44,6 +44,40 @@ app.get('/xkcd-suggest', function(req, res) {
 	});
 });
 
+app.get('/xkcd-list', function(req, res) {
+	var start = parseInt(req.query.start);
+	var reversed = parseInt(req.query.reversed);
+	var size = parseInt(req.query.size);
+	if (isNaN(start) || start < 0 || start > latestIndex ||
+		 (req.query.reversed && isNaN(reversed) || reversed != 0 && reversed != 1 && !isNaN(reversed)) ||
+		 (req.query.size && isNaN(size) || size < 0  && !isNaN(size))) {
+		res.sendStatus(400);
+		return;
+	}
+	if (isNaN(reversed)) { reversed = 0; }
+	if (isNaN(size)) { size = 100; }
+	var end;
+	if (reversed == 0) {
+		end = start + size;
+	} else {
+		end = start + 1;
+		start = end - size;
+	}
+	end = end > latestIndex ? latestIndex + 1 : end;
+	start = start < 1 ? 1 : start;
+	Xkcd.find({num: {$gt : start - 1, $lt : end}}).exec(
+	function(err, docs) {
+		if (err) {
+			console.error(err);
+			res.sendStatus(500);
+		}
+		if (docs) {
+			res.json(docs);
+		}
+	});
+
+});
+
 var j = schedule.scheduleJob('*/15 * * * *', function() {
         console.log("send request, current index is " + latestIndex);
         request(xkcdUrl, function(error, response, body) {
