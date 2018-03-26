@@ -1,6 +1,7 @@
 const fcmServerKey = process.env.XKCD_FCM_KEY;
 const serverChanKey = process.env.SERVER_CHAN_KEY;
 const xkcdUrl = 'https://xkcd.com/info.0.json';
+const specialXkcds = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 var serverChanUrl = 'https://sc.ftqq.com/'+serverChanKey+'.send';
 
 var FCM = require('fcm-push'),
@@ -12,91 +13,40 @@ var FCM = require('fcm-push'),
 	bodyParser = require('body-parser'),
 	sizeOf = require('image-size'),
 	app = express(),
-	port = 3003;
+	port = 3003,
+	XkcdModel = require('./api/models/xkcdModel');
 
-
+var latestIndex = 1971;
+	
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/xkcd_db');
-var latestIndex = 1966;
+Xkcd = mongoose.model('xkcd');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+
+var routes = require('./api/routes/xkcdRoutes'); //importing route
+routes(app); //register the route
+
 app.listen(port);
-app.get('/xkcd-suggest', function(req, res) {
-	var keyword = req.query.q;
-	if (!keyword) {
-		res.sendStatus(500);
-		return;
-	}
-	var id = !isNaN(keyword) ? keyword : 0;
-	Xkcd.find(
-	
-	{$or: [
-		{ $text: {$search: keyword}},
-		{ "num" : id}
-	]},
-	{score: { $meta: "textScore" } }).limit(20).sort({score: { $meta: "textScore" } , "num": -1})
-	.exec(
-	function(err, docs) {
-		if(err) {
-			console.error(err);
-		}
-		if(docs) {
-			res.json(docs);
-		}
-	});
-});
-
-app.get('/xkcd-list', function(req, res) {
-	var start = parseInt(req.query.start);
-	var reversed = parseInt(req.query.reversed);
-	var size = parseInt(req.query.size);
-	if (isNaN(start) || start < 0 || start > latestIndex ||
-		 (req.query.reversed && isNaN(reversed) || reversed != 0 && reversed != 1 && !isNaN(reversed)) ||
-		 (req.query.size && isNaN(size) || size < 0  && !isNaN(size))) {
-		res.sendStatus(400);
-		return;
-	}
-	if (isNaN(reversed)) { reversed = 0; }
-	if (isNaN(size)) { size = 100; }
-	var end;
-	if (reversed == 0) {
-		end = start + size;
-	} else {
-		end = start + 1;
-		start = end - size;
-	}
-	end = end > latestIndex ? latestIndex + 1 : end;
-	start = start < 1 ? 1 : start;
-	Xkcd.find({num: {$gt : start - 1, $lt : end}}).exec(
-	function(err, docs) {
-		if (err) {
-			console.error(err);
-			res.sendStatus(500);
-		}
-		if (docs) {
-			res.json(docs);
-		}
-	});
-
-});
+var specials;
 
 var j = schedule.scheduleJob('*/15 * * * *', function() {
 	console.log("send request, current index is " + latestIndex);
 	request(xkcdUrl, function(error, response, body) {
 			var comics = JSON.parse(body)
-			if (comics.num > latestIndex) {
+			if (comics.num > latestIndex && specials) {
 				latestIndex = comics.num;
-		queryXkcd(latestIndex);
+				queryXkcd(latestIndex, specials);
 				sendNotification(comics);
 				console.log("new comics detected, id: " + comics.num);
-		request.post({
-			url: serverChanUrl,
-			form: {text: 'Xkcd-' + comics.num + ' is on the way',
-				   desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'}},
-			function(error, response, body){
-			if (error) { console.log(error); }
-			if (body) { console.log("serverChan " + body); }
-		});
+				request.post({
+					url: serverChanUrl,
+					form: {text: 'Xkcd-' + comics.num + ' is on the way',
+						   desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'}},
+					function(error, response, body){
+					if (error) { console.log(error); }
+					if (body) { console.log("serverChan " + body); }
+				});
 			}            
 	});
 });
@@ -134,13 +84,20 @@ function range(start, end, step, offset) {
 }
 
 function initMongo(latestIndex) {
-	var ids = range(1, latestIndex);
-	Promise.all(ids.map(queryXkcd)).catch(function(err) {
-		console.error("init Mongo failed " + err);
+	request(specialXkcds, function(error, response, body) {
+		if (error || !body) {
+			console.error("Get special xkcds failed. Init Monge aborted.");
+			return;
+		}
+		specials = JSON.parse(body);
+		var ids = range(1, latestIndex);
+		Promise.all(ids.map(function(x){ return queryXkcd(x, specials); })).catch(function(err) {
+			console.error("init Mongo failed " + err);
+		});
 	});
 }
 
-function queryXkcd(id) {
+function queryXkcd(id, specials) {
 	return new Promise(function(resolve, reject) {
 		var sendXkcdQuery = function(id) {
 			var xkcdUrl = 'https://xkcd.com/' + id + '/info.0.json';
@@ -152,10 +109,22 @@ function queryXkcd(id) {
 				var comics;
 				try {
 					comics = JSON.parse(body);
+					for (var i = 0; i < specials.length; i++) {
+						if (specials[i].num == comics.num && specials[i].img) {
+							comics.img = specials[i].img;
+						}
+					}
 				} catch (_err) {
 					console.error("Parse xkcd " + id + " error " + _err);
-					resolve("");
-					return;
+					for (var i = 0; i < specials.length; i++) {
+						if (specials[i].num == id && specials[i].img) {
+							comics = specials;
+						}
+					}
+					if (!comics) {
+						resolve("");
+						return;
+					}
 				}
 				Xkcd.findOne({'num' : comics.num}, function(err, _xkcd) {
 					if (err) {
@@ -165,15 +134,15 @@ function queryXkcd(id) {
 						if (err || !body) {
 							reject(Error("Download image failed: " + comics.num));
 						}
-var dimens;
-try {
-	dimens = sizeOf(body);
-} catch (sizeError) {
-console.log(comics.num)
-	console.log(comics.img)
-	reject(Error("Invalid img " + comics.num))
-	return;
-}
+						var dimens;
+						try {
+							dimens = sizeOf(body);
+						} catch (sizeError) {
+							console.log(comics.num)
+							console.log(comics.img)
+							reject(Error("Invalid img " + comics.num))
+							return;
+						}
 						var new_xkcd = new Xkcd({
 							num: comics.num,
 							raw: body,
@@ -206,33 +175,6 @@ console.log(comics.num)
 	});
 }
 
-var Schema = mongoose.Schema;
 
-var XkcdSchema = new Schema({
-	num: {
-		type: Number,
-		unique: true,
-		min: 1
-	},
-	alt: {
-		type: String
-	},
-	title: {
-		type: String
-	},
-	img: {
-		type: String
-	},
-	width: {
-		type: Number,
-		default: 0
-	},
-	height: {
-		type: Number,
-		default: 0
-	}
-});
-XkcdSchema.index({title:'text', alt:'text'}, {name: 'TextIndex', weights: {title: 20, alt: 4}});
-Xkcd = mongoose.model('xkcd', XkcdSchema);
 
 initMongo(latestIndex);
