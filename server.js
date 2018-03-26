@@ -1,5 +1,5 @@
-const fcmServerKey = process.env.XKCD_FCM_KEY;
-const serverChanKey = process.env.SERVER_CHAN_KEY;
+const fcmServerKey = process.env.XKCD_FCM_KEY || "000";
+const serverChanKey = process.env.SERVER_CHAN_KEY || "000";
 const xkcdUrl = 'https://xkcd.com/info.0.json';
 const specialXkcds = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 var serverChanUrl = 'https://sc.ftqq.com/'+serverChanKey+'.send';
@@ -14,6 +14,7 @@ var FCM = require('fcm-push'),
 	sizeOf = require('image-size'),
 	app = express(),
 	port = 3003,
+	rp = require('request-promise-native'),
 	XkcdModel = require('./api/models/xkcdModel');
 
 
@@ -51,7 +52,6 @@ var j = schedule.scheduleJob('*/15 * * * *', function() {
 	});
 });
 
-
 var sendNotification = function(xkcd) {
 	var message = {
 		to: '/topics/new_comics',
@@ -84,16 +84,11 @@ function range(start, end, step, offset) {
 }
 
 function initMongo(latestIndex) {
-	request(specialXkcds, function(error, response, body) {
-		if (error || !body) {
-			console.error("Get special xkcds failed. Init Monge aborted.");
-			return;
-		}
-		specials = JSON.parse(body);
+	rp(specialXkcds).then(JSON.parse).then(function(specials) {
 		var ids = range(1, latestIndex);
-		Promise.all(ids.map(function(x){ return queryXkcd(x, specials); })).catch(function(err) {
-			console.error("init Mongo failed " + err);
-		});
+		Promise.all(ids.map(function(x){ return queryXkcd(x, specials); }));
+	}).catch(function(err) {
+		console.error("init Mongo failed " + err);
 	});
 }
 
@@ -105,6 +100,7 @@ function queryXkcd(id, specials) {
 				if (error) {
 					console.error("Query xkcd failed " + id + " " + error);
 					resolve("");
+					return;
 				}
 				var comics;
 				try {
