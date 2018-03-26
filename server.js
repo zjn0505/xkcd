@@ -165,7 +165,15 @@ function queryXkcd(id) {
 						if (err || !body) {
 							reject(Error("Download image failed: " + comics.num));
 						}
-						var dimens = sizeOf(body);
+var dimens;
+try {
+	dimens = sizeOf(body);
+} catch (sizeError) {
+console.log(comics.num)
+	console.log(comics.img)
+	reject(Error("Invalid img " + comics.num))
+	return;
+}
 						var new_xkcd = new Xkcd({
 							num: comics.num,
 							raw: body,
