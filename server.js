@@ -16,7 +16,7 @@ var FCM = require('fcm-push'),
 	port = 3003,
 	XkcdModel = require('./api/models/xkcdModel');
 
-var latestIndex = 1971;
+
 	
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/xkcd_db');
@@ -25,8 +25,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
 var routes = require('./api/routes/xkcdRoutes'); //importing route
-routes(app); //register the route
-
+routes.route(app); //register the route
+latestIndex = routes.latestIndex;
 app.listen(port);
 var specials;
 

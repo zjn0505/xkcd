@@ -1,6 +1,10 @@
 'use strict';
-module.exports = function(app) {
-	var xkcdReqs = require('../controllers/xkcdController');
+var xkcdReqs = require('../controllers/xkcdController');
+
+exports.latestIndex = xkcdReqs.latestIndex;
+
+exports.route = function(app) {
+	
 
 	app.route('/xkcd-suggest')
 	.get(xkcdReqs.xkcd_suggest)

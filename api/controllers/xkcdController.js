@@ -6,7 +6,8 @@ const SERVER_FAILURE_CODE = 400;
 
 var mongoose = require('mongoose'),
 Xkcd = mongoose.model('xkcd');
-
+var latestIndex = 1971;
+exports.latestIndex = latestIndex;
 exports.xkcd_suggest = function(req, res) {
 	var keyword = req.query.q;
 	if (!keyword) {
