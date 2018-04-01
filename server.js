@@ -145,6 +145,9 @@ function queryXkcd(id, specials) {
 							alt: comics.alt,
 							title: comics.title,
 							img: comics.img,
+							day: comics.day,
+							month: comics.month,
+							year: comics.year,
 							width: dimens.width,
 							height: dimens.height
 						});

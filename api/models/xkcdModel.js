@@ -22,7 +22,17 @@ var XkcdSchema = new Schema({
 	height: {
 		type: Number,
 		default: 0
+	},
+	day: {
+		type: String
+	},
+	month: {
+		type: String
+	},
+	year: {
+		type: String
 	}
+
 });
 XkcdSchema.index({title:'text', alt:'text'}, {name: 'TextIndex', weights: {title: 20, alt: 4}});
 module.exports = mongoose.model('xkcd', XkcdSchema);
