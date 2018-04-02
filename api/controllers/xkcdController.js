@@ -65,3 +65,7 @@ exports.xkcd_list = function(req, res) {
 		}
 	});
 }
+
+exports.setLatest = function(latest) {
+	latestIndex = latest;
+}

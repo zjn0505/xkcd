@@ -3,6 +3,10 @@ var xkcdReqs = require('../controllers/xkcdController');
 
 exports.latestIndex = xkcdReqs.latestIndex;
 
+exports.setLatest = function(latestIndex) {
+	xkcdReqs.setLatest(latestIndex);
+}
+
 exports.route = function(app) {
 	
 

@@ -37,6 +37,7 @@ var j = schedule.scheduleJob('*/15 * * * *', function() {
 			var comics = JSON.parse(body)
 			if (comics.num > latestIndex && specials) {
 				latestIndex = comics.num;
+				app.setLatest(latestIndex);
 				queryXkcd(latestIndex, specials);
 				sendNotification(comics);
 				console.log("new comics detected, id: " + comics.num);
@@ -84,14 +85,15 @@ function range(start, end, step, offset) {
 }
 
 function initMongo() {
-	rp(xkcdurl).then(JSON.parse).then(function(latestComic) {
+	rp(xkcdUrl).then(JSON.parse).then(function(latestComic) {
 		latestIndex == latestComic.num;
 	}).then(function() {
 		return rp(specialXkcds); 
 	}).then(JSON.parse).then(function(specialsResp) {
-		specials = specialsResp
-		var ids = range(1, latestIndex);
-		Promise.all(ids.map(function(x){ return queryXkcd(x, specialsResp); }));
+		specials = specialsResp;
+		return ids = range(1, latestIndex);
+	}).then(function(ids) {
+		return Promise.all(ids.map(function(x){ return queryXkcd(x, specialsResp); }));
 	}).catch(function(err) {
 		console.error("init Mongo failed " + err);
 	});
