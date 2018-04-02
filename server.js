@@ -83,10 +83,15 @@ function range(start, end, step, offset) {
 	});
 }
 
-function initMongo(latestIndex) {
-	rp(specialXkcds).then(JSON.parse).then(function(specials) {
+function initMongo() {
+	rp(xkcdurl).then(JSON.parse).then(function(latestComic) {
+		latestIndex == latestComic.num;
+	}).then(function() {
+		return rp(specialXkcds); 
+	}).then(JSON.parse).then(function(specialsResp) {
+		specials = specialsResp
 		var ids = range(1, latestIndex);
-		Promise.all(ids.map(function(x){ return queryXkcd(x, specials); }));
+		Promise.all(ids.map(function(x){ return queryXkcd(x, specialsResp); }));
 	}).catch(function(err) {
 		console.error("init Mongo failed " + err);
 	});
@@ -176,4 +181,4 @@ function queryXkcd(id, specials) {
 
 
 
-initMongo(latestIndex);
+initMongo();
