@@ -2,6 +2,7 @@ const fcmServerKey = process.env.XKCD_FCM_KEY || "000";
 const serverChanKey = process.env.SERVER_CHAN_KEY || "000";
 const xkcdUrl = 'https://xkcd.com/info.0.json';
 const specialXkcds = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
+const specialXkcdsFallback = 'https://rawgit.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 var serverChanUrl = 'https://sc.ftqq.com/'+serverChanKey+'.send';
 
 var FCM = require('fcm-push'),
@@ -33,24 +34,36 @@ var specials;
 
 var j = schedule.scheduleJob('*/15 * * * *', function() {
 	console.log("send request, current index is " + latestIndex);
-	request(xkcdUrl, function(error, response, body) {
-			var comics = JSON.parse(body)
-			if (comics.num > latestIndex && specials) {
-				latestIndex = comics.num;
-				routes.setLatest(latestIndex);
-				queryXkcd(latestIndex, specials);
-				sendNotification(comics);
-				console.log("new comics detected, id: " + comics.num);
-				request.post({
-					url: serverChanUrl,
-					form: {text: 'Xkcd-' + comics.num + ' is on the way',
-						   desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'}},
-					function(error, response, body){
-					if (error) { console.log(error); }
-					if (body) { console.log("serverChan " + body); }
-				});
-			}            
-	});
+	rp(xkcdUrl).then(JSON.parse).then(function(comics) {
+		if (comics.num > latestIndex && specials) {
+			latestIndex = comics.num;
+			routes.setLatest(latestIndex);
+			getXkcdFullInfo(latestIndex);
+			sendNotification(comics);
+			console.log("new comics detected, id: " + comics.num);
+			return(comics);
+		} else {
+			return Promise.reject("");
+		}      
+	}).then(function(comics) {
+		var options = {
+			method: 'POST',
+			url: serverChanUrl,
+			form: {
+				text: 'Xkcd-' + comics.num + ' is on the way',
+				desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'
+			}
+		}
+		return rp(options).then(function(body) {
+			if (!body) {
+				console.log("serverChan " + body);
+			} else {
+				throw "serverChan request failed" 
+			}
+		});
+	}).catch(function(err) {
+		console.log(err);
+	})
 });
 
 var sendNotification = function(xkcd) {
@@ -83,104 +96,102 @@ function range(start, end, step, offset) {
 		return startingPoint + (stepSize * index);
 	});
 }
-
+ 
 function initMongo() {
 	rp(xkcdUrl).then(JSON.parse).then(function(latestComic) {
-		latestIndex == latestComic.num;
+		latestIndex = latestComic.num;
+		routes.setLatest(latestIndex);
+		console.log("init and the latest is " + latestIndex);
 	}).then(function() {
-		return rp(specialXkcds); 
+		return rp({ url: specialXkcds, simple: true }).catch(function(err) {
+			console.log("Use special xkcds fallback");
+			return rp(specialXkcdsFallback);
+		}); 
 	}).then(JSON.parse).then(function(specialsResp) {
 		specials = specialsResp;
+		console.log("init and the specials length is " + specials.length);
 		return ids = range(1, latestIndex);
 	}).then(function(ids) {
-		return Promise.all(ids.map(function(x){ return queryXkcd(x, specials); }));
+		return Promise.all(ids.map(function(id){ return getXkcdFullInfo(id); }));
 	}).catch(function(err) {
 		console.error("init Mongo failed " + err);
 	});
 }
 
-function queryXkcd(id, specials) {
-	return new Promise(function(resolve, reject) {
-		var sendXkcdQuery = function(id) {
-			var xkcdUrl = 'https://xkcd.com/' + id + '/info.0.json';
-			request(xkcdUrl, function(error, response, body) {
-				if (error) {
-					console.error("Query xkcd failed " + id + " " + error);
-					resolve("");
-					return;
-				}
-				var comics;
-				try {
-					comics = JSON.parse(body);
-					for (var i = 0; i < specials.length; i++) {
-						if (specials[i].num == comics.num && specials[i].img) {
-							comics.img = specials[i].img;
-						}
-					}
-				} catch (_err) {
-					console.error("Parse xkcd " + id + " error " + _err);
-					for (var i = 0; i < specials.length; i++) {
-						if (specials[i].num == id && specials[i].img) {
-							comics = specials;
-						}
-					}
-					if (!comics) {
-						resolve("");
-						return;
-					}
-				}
-				Xkcd.findOne({'num' : comics.num}, function(err, _xkcd) {
-					if (err) {
-						reject(Error("Query xkcd failed"));
-					}
-					request.get({ url: comics.img, encoding: null}, function(err, response, body) {
-						if (err || !body) {
-							reject(Error("Download image failed: " + comics.num));
-						}
-						var dimens;
-						try {
-							dimens = sizeOf(body);
-						} catch (sizeError) {
-							console.log(comics.num)
-							console.log(comics.img)
-							reject(Error("Invalid img " + comics.num))
-							return;
-						}
-						var new_xkcd = new Xkcd({
-							num: comics.num,
-							raw: body,
-							alt: comics.alt,
-							title: comics.title,
-							img: comics.img,
-							day: comics.day,
-							month: comics.month,
-							year: comics.year,
-							width: dimens.width,
-							height: dimens.height
-						});
-						new_xkcd.save(function(err, xkcdSaved) {
-							if (err) {
-								reject(Error("Save xkcd failed" + err));
-							}
-							if (xkcdSaved) {
-								resolve("");
-							}
-						});
-					});
-				});
-			});
+function getXkcdFullInfo(id) {
+	return Xkcd.findOne({'num' : id}).exec().then(function(doc) {
+		if (!doc || !doc.width || !doc.height) {
+			return queryAndAddToMongo(id);
+		} else {
+			return doc;
 		}
-		Xkcd.findOne({'num' : id}, function(err, _xkcd) {
-			if (err || _xkcd == null || (latestIndex - id) < 10 || _xkcd.width == 0) {
-				sendXkcdQuery(id);
-				return;
-			} else {
-				resolve("");
-			}
-		});   
+	}).catch(function(err) {
+		throw err;
 	});
 }
 
 
+function queryAndAddToMongo(id) {
+	var url = 'https://xkcd.com/' + id + '/info.0.json';
+	return rp({ url: url, simple: true }).then(function(body) {
+		var comics;
+		try {
+			comics = JSON.parse(body);
+			for (var i = 0; i < specials.length; i++) {
+				if (specials[i].num == comics.num && specials[i].img != undefined) {
+					comics.img = specials[i].img;
+				}
+			}
+		} catch (err) {
+			console.error("Parse xkcd " + id + " error " + err);
+			for (var i = 0; i < specials.length; i++) {
+				if (specials[i].num == id && specials[i].img != undefined) {
+					comics = specials;
+					console.log("Apply " + comics.num + " from specials");
+				}
+			}
+			if (!comics) {
+				throw "Query xkcd failed " + id;
+			}
+		}
+		return comics;
+	}).then(getComicsWithSize).then(function(fullXkcd) {
+		return fullXkcd.save().then(function(xkcdSaved) {
+			return xkcdSaved;
+		});
+	}).catch(function(err) {
+		console.error("Query xkcd failed " + id);
+		throw err;
+	});
+}
+
+function getComicsWithSize(comics) {
+	return rp({ url: comics.img, encoding: null}).then(function(body) {
+		if (!body) {
+			throw "Download image failed: " + comics.num;
+		}
+		var dimens;
+		try {
+			dimens = sizeOf(body);
+		} catch (sizeError) {
+			throw "Invalid img " + comics.num + " " + comics.img
+		}
+		return new Xkcd({
+			num: comics.num,
+			raw: body,
+			alt: comics.alt,
+			title: comics.title,
+			img: comics.img,
+			day: comics.day,
+			month: comics.month,
+			year: comics.year,
+			width: dimens.width,
+			height: dimens.height
+		});
+	}).catch(function(err) {
+		console.error("get xkcd size failed " + comics.num + " " + comics.img);
+		throw err ;
+	});
+}
 
 initMongo();
