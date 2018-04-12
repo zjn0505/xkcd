@@ -15,4 +15,7 @@ exports.route = function(app) {
 	
 	app.route('/xkcd-list')
 	.get(xkcdReqs.xkcd_list)
+	
+	app.route('/xkcd-thumb-up')
+	.post(xkcdReqs.xkcd_thumb_up)
 };

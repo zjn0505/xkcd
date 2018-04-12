@@ -31,6 +31,10 @@ var XkcdSchema = new Schema({
 	},
 	year: {
 		type: String
+	},
+	thumbCount: {
+		type: Number,
+		default: 0
 	}
 
 });

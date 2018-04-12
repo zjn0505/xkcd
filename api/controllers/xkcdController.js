@@ -69,3 +69,23 @@ exports.xkcd_list = function(req, res) {
 exports.setLatest = function(latest) {
 	latestIndex = latest;
 }
+
+exports.xkcd_thumb_up = function(req, res) {
+	console.log(req);
+	var id = parseInt(req.body.comic_id);
+	Xkcd.findOne({'num' : id}, function(err, xkcd) {
+		if (err || xkcd == null) {
+			res.sendStatus(500);
+			return;
+		}
+		xkcd.thumbCount = xkcd.thumbCount + 1;
+		xkcd.save(function(err, xkcdSaved) {
+			if (err) {
+				res.sendStatus(500);
+			}
+			if (xkcdSaved) {
+				res.json(xkcdSaved);
+			}
+		});
+	});
+}
