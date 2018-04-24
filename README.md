@@ -1,13 +1,14 @@
 # xkcd
+---
 
-## Table of Contents
+## Api list
 
 - [Get xkcd search recommendation](#get-xkcd-search-recommendation)
 - [Get xkcd list with paging](#get-xkcd-list-with-paging)
 - [Give a thumb up](#give-a-thumb-up)
 - [Get top xkcds](#get-top-xkcds)
 
-
+---
 ### Get xkcd search recommendation
 
 * **URL**
