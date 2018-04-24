@@ -192,71 +192,61 @@
         "width": 571,
         "height": 366,
         "thumbCount": 36,
-        "_id": "5ad9fcecf1b30e49872a02bc",
         "num": 1983,
         "alt": "I found a copy of The Life-Changing Magic of Tidying Up, but the idea of reading it didn't spark joy, so I gave it away.",
         "title": "Clutter",
         "img": "https://imgs.xkcd.com/comics/clutter.png",
         "day": "20",
         "month": "4",
-        "year": "2018",
-        "__v": 0
+        "year": "2018"
     },
     {
         "width": 672,
         "height": 408,
         "thumbCount": 27,
-        "_id": "5ad0bb64f1b30e49872a02b9",
         "num": 1980,
         "alt": "I take it Narnia doesn't have Cinnabons? Because if you can magic up a plate of those, I'll betray whoever.",
         "title": "Turkish Delight",
         "img": "https://imgs.xkcd.com/comics/turkish_delight.png",
         "day": "13",
         "month": "4",
-        "year": "2018",
-        "__v": 0
+        "year": "2018"
     },
     {
         "width": 386,
         "height": 294,
         "thumbCount": 14,
-        "_id": "5ac38e32b86a71129bc8389d",
         "num": 1973,
         "alt": "That one is a variable star which pulses every 30 seconds. Its name comes from a Greek word meaning \"smoke alarm.\"",
         "title": "Star Lore",
         "img": "https://imgs.xkcd.com/comics/star_lore.png",
         "day": "28",
         "month": "3",
-        "year": "2018",
-        "__v": 0
+        "year": "2018"
     },
     {
         "width": 636,
         "height": 359,
         "thumbCount": 11,
-        "_id": "5ac0dd6cfef3b7284117d94c",
         "num": 1956,
         "alt": "For a while, some physicists worked on a theory unifying the other forces with both the force of gravity and the film \"Gravity,\" but even after Alfonso CuarÃ³n was held in a deep underground chamber of water for 10^31 years he refused to sell his film to Disney.",
         "title": "Unification",
         "img": "https://imgs.xkcd.com/comics/unification.png",
         "day": "16",
         "month": "2",
-        "year": "2018",
-        "__v": 0
+        "year": "2018"
     },
     {
         "width": 615,
         "height": 282,
         "thumbCount": 10,
-        "_id": "5ac0dd6efef3b7284117db77",
         "num": 1955,
         "alt": "Don't be nervous about the robots, be nervous about the people with the resources to build them.",
         "title": "Robots",
         "img": "https://imgs.xkcd.com/comics/robots.png",
         "day": "14",
         "month": "2",
-        "year": "2018",
-        "__v": 0
+        "year": "2018"
     },
     ...
 ]
