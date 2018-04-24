@@ -9,7 +9,6 @@ exports.setLatest = function(latestIndex) {
 
 exports.route = function(app) {
 	
-
 	app.route('/xkcd-suggest')
 	.get(xkcdReqs.xkcd_suggest)
 	
@@ -18,4 +17,7 @@ exports.route = function(app) {
 	
 	app.route('/xkcd-thumb-up')
 	.post(xkcdReqs.xkcd_thumb_up)
+	
+	app.route('/xkcd-top')
+	.get(xkcdReqs.xkcd_top)
 };

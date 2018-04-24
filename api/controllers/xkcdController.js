@@ -89,3 +89,24 @@ exports.xkcd_thumb_up = function(req, res) {
 		});
 	});
 }
+
+exports.xkcd_top = function(req, res) {
+	console.log(req);
+	var sortby = req.query.sortby;
+	if (sortby != "thumb-up") {
+		res.sendStatus(400);
+		return;
+	}
+	
+	Xkcd.find({thumbCount: {$gt : 0}})
+	.sort({thumbCount: -1}).limit(100)
+	.exec(function(err, docs) {
+		if (err) {
+			console.error(err);
+			res.sendStatus(500);
+		}
+		if (docs) {
+			res.json(docs);
+		}
+	});
+}
