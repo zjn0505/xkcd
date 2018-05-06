@@ -1,9 +1,11 @@
 const fcmServerKey = process.env.XKCD_FCM_KEY || "000";
 const serverChanKey = process.env.SERVER_CHAN_KEY || "000";
+const pushBearKey = process.env.PUSH_BEAR_KEY || "000";
 const xkcdUrl = 'https://xkcd.com/info.0.json';
 const specialXkcds = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 const specialXkcdsFallback = 'https://rawgit.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 var serverChanUrl = 'https://sc.ftqq.com/'+serverChanKey+'.send';
+var pushBearUrl = 'https://pushbear.ftqq.com/sub?sendkey=' + pushBearKey;
 
 var FCM = require('fcm-push'),
 	fcm = new FCM(fcmServerKey),
@@ -18,8 +20,6 @@ var FCM = require('fcm-push'),
 	rp = require('request-promise-native'),
 	XkcdModel = require('./api/models/xkcdModel');
 
-
-	
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/xkcd_db');
 Xkcd = mongoose.model('xkcd');
@@ -45,23 +45,9 @@ var j = schedule.scheduleJob('*/15 * * * *', function() {
 		} else {
 			return Promise.reject("");
 		}      
-	}).then(function(comics) {
-		var options = {
-			method: 'POST',
-			url: serverChanUrl,
-			form: {
-				text: 'Xkcd-' + comics.num + ' is on the way',
-				desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'
-			}
-		}
-		return rp(options).then(function(body) {
-			if (!body) {
-				console.log("serverChan " + body);
-			} else {
-				throw "serverChan request failed" 
-			}
-		});
-	}).catch(function(err) {
+	}).then(sendNotificationToFtqq(comics, serverChanUrl))
+	.then(sendNotificationToFtqq(comics, pushBearUrl))
+	.catch(function(err) {
 		console.log(err);
 	})
 });
@@ -84,6 +70,25 @@ var sendNotification = function(xkcd) {
 		} else {
 			console.log("FCM Successfully sent with response: ", response);
 		}
+	});
+}
+
+var sendNotificationToFtqq = function(comics, url) {
+	var options = {
+			method: 'POST',
+			url: url,
+			form: {
+				text: 'xkcd-' + comics.num + '-is-on-the-way',
+				desp: '```json\n'+JSON.stringify(comics, null, 4)+ '\n```\n[![comics]('+comics.img+')]('+comics.img+')'
+			}
+		}
+	return rp(options).then(function(body) {
+		if (!body) {
+			console.log("ftqq " + body);
+		} else {
+			throw "ftqq request failed" 
+		}
+		return(comics);
 	});
 }
 
