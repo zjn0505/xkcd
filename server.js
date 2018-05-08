@@ -45,8 +45,8 @@ var j = schedule.scheduleJob('*/15 * * * *', function() {
 		} else {
 			return Promise.reject("");
 		}      
-	}).then(sendNotificationToFtqq(comics, serverChanUrl))
-	.then(sendNotificationToFtqq(comics, pushBearUrl))
+	}).then(function(comics) { return sendNotificationToFtqq(comics, serverChanUrl); })
+	.then(function(comics) { return sendNotificationToFtqq(comics, pushBearUrl); })
 	.catch(function(err) {
 		console.log(err);
 	})
