@@ -6,7 +6,7 @@ const SERVER_FAILURE_CODE = 400;
 
 var mongoose = require('mongoose'),
 Xkcd = mongoose.model('xkcd');
-var latestIndex = 1989;
+var latestIndex = 1991;
 exports.latestIndex = latestIndex;
 exports.xkcd_suggest = function(req, res) {
 	var keyword = req.query.q;
@@ -71,7 +71,6 @@ exports.setLatest = function(latest) {
 }
 
 exports.xkcd_thumb_up = function(req, res) {
-	console.log(req);
 	var id = parseInt(req.body.comic_id);
 	Xkcd.findOne({'num' : id}, function(err, xkcd) {
 		if (err || xkcd == null) {
@@ -91,7 +90,6 @@ exports.xkcd_thumb_up = function(req, res) {
 }
 
 exports.xkcd_top = function(req, res) {
-	console.log(req);
 	var sortby = req.query.sortby;
 	if (sortby != "thumb-up") {
 		res.sendStatus(400);

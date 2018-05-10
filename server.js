@@ -83,7 +83,7 @@ var sendNotificationToFtqq = function(comics, url) {
 			}
 		}
 	return rp(options).then(function(body) {
-		if (!body) {
+		if (body) {
 			console.log("ftqq " + body);
 		} else {
 			throw "ftqq request failed" 
