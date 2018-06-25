@@ -7,8 +7,20 @@ const SERVER_FAILURE_CODE = 400;
 var mongoose = require('mongoose'),
 WhatIf = mongoose.model('whatif');
 
+var latestIndex = 156;
+
+exports.latestIndex = latestIndex;
+
+exports.setLatest = function(latest) {
+	latestIndex = latest;
+}
+
 exports.what_if_thumb_up = function(req, res) {
 	var id = parseInt(req.body.what_if_id);
+	if (id == NaN || id == null || id <= 0 || id > latestIndex + 2) {
+		res.sendStatus(400);
+		return;
+	}
 	WhatIf.findOne({'num' : id}, function(err, whatIf) {
 		if (err || whatIf == null) {
 			var newWhatIf = new WhatIf({
