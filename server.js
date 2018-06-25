@@ -35,6 +35,10 @@ latestIndex = routes.latestIndex;
 app.listen(port);
 var specials;
 
+if (fcmServerKey=="000" || serverChanKey == "000" || pushBearKey == "000") {
+	console.error("Invalid key initialzation");
+}
+
 var j = schedule.scheduleJob('*/15 * * * *', function() {
 	console.log("send request, current index is " + latestIndex);
 	rp(xkcdUrl).then(JSON.parse).then(function(comics) {
