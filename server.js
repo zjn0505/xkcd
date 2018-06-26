@@ -36,4 +36,3 @@ schedule.scheduleJob('0 0 * * *', function() {
 
 xkcdCrawler.getLatest();
 whatIfCrawler.getLatest();
-whatIfCrawler.regularCheck();
