@@ -55,7 +55,7 @@ exports.newWhatIfForFCM = function(article) {
 	});
 }
 
-exports.newComicsForFtqq = function(comics, url) {
+exports.newComicsForFtqq = function(comics, service) {
 	var options = {
 			method: 'POST',
 			url: service == "serverChan" ? serverChanUrl : pushBearUrl,
