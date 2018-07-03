@@ -4,9 +4,9 @@
 
 - [Get xkcd search recommendation](#get-xkcd-search-recommendation)
 - [Get xkcd list with paging](#get-xkcd-list-with-paging)
-- [Give a thumb up to xkcd](#give-a-thumb-up-xkcd)
+- [Give a thumb up to xkcd](#give-a-thumb-up-to-xkcd)
 - [Get top xkcds](#get-top-xkcds)
-- [Give a thumb up to what if](#give-a-thumb-up-what-if)
+- [Give a thumb up to what if](#give-a-thumb-up-to-what-if)
 - [Get top what ifs](#get-top-what-ifs)
 
 ---
