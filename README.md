@@ -4,8 +4,10 @@
 
 - [Get xkcd search recommendation](#get-xkcd-search-recommendation)
 - [Get xkcd list with paging](#get-xkcd-list-with-paging)
-- [Give a thumb up](#give-a-thumb-up)
+- [Give a thumb up to xkcd](#give-a-thumb-up-xkcd)
 - [Get top xkcds](#get-top-xkcds)
+- [Give a thumb up to what if](#give-a-thumb-up-what-if)
+- [Get top what ifs](#get-top-what-ifs)
 
 ---
 ### Get xkcd search recommendation
@@ -126,7 +128,7 @@
 ```
 ----
 
-### Give a thumb up
+### Give a thumb up to xkcd
 
 * **URL**
 
@@ -247,6 +249,74 @@
         "day": "14",
         "month": "2",
         "year": "2018"
+    },
+    ...
+]
+```
+----
+
+### Give a thumb up to what if
+
+* **URL**
+
+  /what-if-thumb-up
+  
+* **Method**
+ 
+  `POST`
+
+* **URL Params**
+
+| Name | Required | Type  | Description |
+| ---  | :---:    | ---   | ---         |
+| what_if_id|  *  |Integer| what if id |
+
+* **Data Params**
+
+  None
+
+* **Success Response**
+
+```json
+{
+    "thumbCount": 1,
+    "_id": "5b3af0592ea0677e5a37fce5",
+    "num": 152
+}
+```
+----
+
+### Get top what ifs
+
+* **URL**
+
+  /what-if-top
+  
+* **Method**
+ 
+  `GET`
+
+* **URL Params**
+
+| Name | Required | Type  | Description |
+| ---  | :---:    | ---   | ---         |
+| sortby|  *       |String| "thumb-up" |
+
+* **Data Params**
+
+  None
+
+* **Success Response**
+
+```json
+[
+    {
+        "thumbCount": 7,
+        "num": 144
+    },
+    {
+        "thumbCount": 4,
+        "num": 13
     },
     ...
 ]
