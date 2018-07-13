@@ -25,6 +25,7 @@
 | Name | Required | Type | Description |
 | ---  | :---:    | ---  | ---         |
 |  q   |  *       |String| xkcd query  |
+| size |          |Integer| result size|
 
 * **Data Params**
 
@@ -72,7 +73,7 @@
 
 | Name | Required | Type  | Description |
 | ---  | :---:    | ---   | ---         |
-| start|  *       |Integer| start index |
+| start|  *       |Integer| start index, starts from 0, 0 means the last item |
 |reversed|        |Integer| 0 not reversed, 1 reversed, default `0` |
 | size |          |Integer| size of xkcd list, default `100` |
 
@@ -181,6 +182,7 @@
 | Name | Required | Type  | Description |
 | ---  | :---:    | ---   | ---         |
 | sortby|  *       |String| "thumb-up" |
+| size |          |Integer| result size |
 
 * **Data Params**
 
@@ -301,6 +303,7 @@
 | Name | Required | Type  | Description |
 | ---  | :---:    | ---   | ---         |
 | sortby|  *       |String| "thumb-up" |
+| size |          |Integer| result size |
 
 * **Data Params**
 
