@@ -83,7 +83,7 @@ exports.xkcd_list = function (req, res) {
 			}
 		})
 		.sort({
-			num: reversed == 0 ? 1 : 1
+			num: reversed == 0 ? 1 : -1
 		})
 		.exec(
 			function (err, docs) {
