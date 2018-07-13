@@ -6,10 +6,11 @@ const SERVER_FAILURE_CODE = 400;
 
 var mongoose = require('mongoose'),
 	Xkcd = mongoose.model('xkcd');
-var latestIndex = 2011;
+var latestIndex = 2018;
 exports.latestIndex = latestIndex;
 exports.xkcd_suggest = function (req, res) {
 	var keyword = req.query.q;
+	var size = parseInt(req.query.size);
 	if (!keyword) {
 		res.sendStatus(SERVER_FAILURE_CODE);
 		return;
@@ -29,7 +30,7 @@ exports.xkcd_suggest = function (req, res) {
 			score: {
 				$meta: "textScore"
 			}
-		}).limit(20).sort({
+		}).limit(isNaN(size) ? 20 : size).sort({
 			score: {
 				$meta: "textScore"
 			},
@@ -123,6 +124,7 @@ exports.xkcd_thumb_up = function (req, res) {
 
 exports.xkcd_top = function (req, res) {
 	var sortby = req.query.sortby;
+	var size = parseInt(req.query.size);
 	if (sortby != "thumb-up") {
 		res.sendStatus(400);
 		return;
@@ -135,7 +137,7 @@ exports.xkcd_top = function (req, res) {
 		})
 		.sort({
 			thumbCount: -1
-		}).limit(100)
+		}).limit(isNaN(size) ? 100 : size)
 		.exec(function (err, docs) {
 			if (err) {
 				console.error(err);
