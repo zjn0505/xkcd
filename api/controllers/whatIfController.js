@@ -45,13 +45,15 @@ exports.what_if_thumb_up = function(req, res) {
 
 exports.what_if_top = function(req, res) {
 	var sortby = req.query.sortby;
+	var size = parseInt(req.query.size);
 	if (sortby != "thumb-up") {
 		res.sendStatus(400);
 		return;
 	}
 	
 	WhatIf.find({thumbCount: {$gt : 0}})
-	.sort({thumbCount: -1}).limit(100)
+	.sort({thumbCount: -1})
+	.limit(isNaN(size) ? 100 : size)
 	.exec(function(err, docs) {
 		if (err) {
 			console.error(err);
