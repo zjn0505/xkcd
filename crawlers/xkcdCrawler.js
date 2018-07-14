@@ -33,7 +33,7 @@ exports.getLatest = function() {
 	}).then(function(ids) {
 		return Promise.all(ids.map(getXkcdFullInfo));
 	}).catch(function(err) {
-		console.error("init Mongo failed " + err);
+		console.error("init xkcd Mongo failed " + err);
 	});
 }
 
