@@ -9,6 +9,12 @@ exports.setLatest = function(latestIndex) {
 
 exports.route = function(app) {
 
+	app.route('/what-if-suggest')
+	.get(whatIfReqs.what_if_suggest)
+	
+	app.route('/what-if-list')
+	.get(whatIfReqs.what_if_list)
+
 	app.route('/what-if-thumb-up')
 	.post(whatIfReqs.what_if_thumb_up)
 	

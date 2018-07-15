@@ -69,7 +69,7 @@ exports.xkcd_list = function (req, res) {
 		end = start + size;
 	} else if (start == 0 && reversed == 1) {
 		end = latestIndex + 1;
-		start = latestIndex - size;
+		start = latestIndex - size + 1;
 	} else {
 		end = start + 1;
 		start = end - size;

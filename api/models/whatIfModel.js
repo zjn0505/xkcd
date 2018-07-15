@@ -24,4 +24,5 @@ var WhatIfSchema = new Schema({
 	}
 
 });
+WhatIfSchema.index({title:'text'}, {name: 'TextIndex', weights: {title: 20}});
 module.exports = mongoose.model('whatif', WhatIfSchema);
