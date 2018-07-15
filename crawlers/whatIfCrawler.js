@@ -63,6 +63,7 @@ function loadDb() {
 					if (err || whatIf == null) {
 						whatIf = new WhatIf();
 					}
+					whatIf.num = num;
 					whatIf.title = title;
 					whatIf.date = content.childNodes[5].childNodes[0].data;
 					whatIf.featureImg = "https://what-if.xkcd.com/imgs/a/"+num+"/archive_crop.png";
