@@ -29,7 +29,9 @@ exports.xkcd_suggest = function (req, res) {
 		}, {
 			score: {
 				$meta: "textScore"
-			}
+			},
+			_id: 0,
+			__v: 0
 		}).limit(isNaN(size) ? 20 : size).sort({
 			score: {
 				$meta: "textScore"
@@ -81,6 +83,9 @@ exports.xkcd_list = function (req, res) {
 				$gt: start - 1,
 				$lt: end
 			}
+		}, {
+			_id: 0,
+			__v: 0
 		})
 		.sort({
 			num: reversed == 0 ? 1 : -1
@@ -105,6 +110,8 @@ exports.xkcd_thumb_up = function (req, res) {
 	var id = parseInt(req.body.comic_id);
 	Xkcd.findOne({
 		'num': id
+	}, {
+		__v: 0
 	}, function (err, xkcd) {
 		if (err || xkcd == null) {
 			res.sendStatus(500);
@@ -134,6 +141,9 @@ exports.xkcd_top = function (req, res) {
 			thumbCount: {
 				$gt: 0
 			}
+		}, {
+			_id: 0,
+			__v: 0
 		})
 		.sort({
 			thumbCount: -1
