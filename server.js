@@ -1,16 +1,18 @@
 var	schedule = require('node-schedule'),
+	config = require('config'),
 	mongoose = require('mongoose'),
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	app = express(),
-	port = 3003,
+	port = config.port,
+	swStats = require('swagger-stats'),
 	XkcdModel = require('./api/models/xkcdModel'),
 	WhatIfModel = require('./api/models/whatIfModel'),
 	xkcdCrawler = require('./crawlers/xkcdCrawler'),
 	whatIfCrawler = require('./crawlers/whatIfCrawler');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/xkcd_db');
+mongoose.connect(config.db);
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -19,6 +21,25 @@ var routes = require('./api/routes/xkcdRoutes'); //importing route
 routes.route(app); //register the route
 var routesWhatIf = require('./api/routes/whatIfRoutes');
 routesWhatIf.route(app);
+
+if (config.has("swagger-stats")) {
+    var swaggerConfig = config.get("swagger-stats");
+    app.use(swStats.getMiddleware({
+        name: swaggerConfig.name,
+        uriPath: swaggerConfig.urlPath,
+        onResponseFinish: function (req, res, rrr) {
+            debug('onResponseFinish: %s', JSON.stringify(rrr));
+        },
+        authentication: true,
+        sessionMaxAge: 900,
+        elasticsearchIndexPrefix: swaggerConfig.elasticsearchIndexPrefix,
+        elasticsearch: swaggerConfig.elasticsearch,
+        onAuthenticate: function (req, username, password) {
+            return ((username === swaggerConfig.username) && (password === swaggerConfig.password));
+        }
+    }));
+}
+
 app.listen(port);
 
 xkcdCrawler.register(mongoose.model('xkcd'));
