@@ -1,4 +1,5 @@
 var	schedule = require('node-schedule'),
+	debug = require('debug')('server'),
 	config = require('config'),
 	mongoose = require('mongoose'),
 	express = require('express'),
@@ -17,11 +18,6 @@ mongoose.connect(config.db);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-var routes = require('./api/routes/xkcdRoutes'); //importing route
-routes.route(app); //register the route
-var routesWhatIf = require('./api/routes/whatIfRoutes');
-routesWhatIf.route(app);
-
 if (config.has("swagger-stats")) {
     var swaggerConfig = config.get("swagger-stats");
     app.use(swStats.getMiddleware({
@@ -39,6 +35,11 @@ if (config.has("swagger-stats")) {
         }
     }));
 }
+
+var routes = require('./api/routes/xkcdRoutes'); //importing route
+routes.route(app); //register the route
+var routesWhatIf = require('./api/routes/whatIfRoutes');
+routesWhatIf.route(app);
 
 app.listen(port);
 
