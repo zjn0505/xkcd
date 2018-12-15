@@ -21,7 +21,8 @@ exports.newComicsForFCM = function(xkcd) {
 			xkcd: xkcd
 		},
 		android: {
-			ttl: "172800s"
+			ttl: "172800s",
+			"priority": "high"
 		},
 			time_to_live: 172800
 	};
@@ -42,7 +43,8 @@ exports.newWhatIfForFCM = function(article) {
 			whatif: article
 		},
 		android: {
-			ttl: "172800s"
+			ttl: "172800s",
+			"priority": "high"
 		},
 			time_to_live: 172800
 	};
