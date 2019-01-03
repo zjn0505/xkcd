@@ -5,7 +5,8 @@ const CLIENT_FAILURE_CODE = 400;
 const SERVER_FAILURE_CODE = 400;
 
 var mongoose = require('mongoose'),
-	Xkcd = mongoose.model('xkcd');
+	Xkcd = mongoose.model('xkcd'),
+	xkcdCrawler = require('../../crawlers/xkcdCrawler');
 var latestIndex = 2019;
 exports.latestIndex = latestIndex;
 exports.xkcd_suggest = function (req, res) {
@@ -157,4 +158,9 @@ exports.xkcd_top = function (req, res) {
 				res.json(docs);
 			}
 		});
+}
+
+exports.xkcd_refresh = function (req, res) {
+	xkcdCrawler.regularCheck()
+	res.sendStatus(202)
 }

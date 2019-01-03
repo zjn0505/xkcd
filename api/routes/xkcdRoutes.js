@@ -20,4 +20,7 @@ exports.route = function(app) {
 	
 	app.route('/xkcd-top')
 	.get(xkcdReqs.xkcd_top)
+
+	app.route('/xkcd-refresh')
+	.post(xkcdReqs.xkcd_refresh)
 };

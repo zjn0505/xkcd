@@ -20,4 +20,7 @@ exports.route = function(app) {
 	
 	app.route('/what-if-top')
 	.get(whatIfReqs.what_if_top)
+
+	app.route('/what-if-refresh')
+	.post(whatIfReqs.what_if_refresh)
 };

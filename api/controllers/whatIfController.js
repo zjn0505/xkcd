@@ -5,7 +5,8 @@ const CLIENT_FAILURE_CODE = 400;
 const SERVER_FAILURE_CODE = 400;
 
 var mongoose = require('mongoose'),
-	WhatIf = mongoose.model('whatif');
+	WhatIf = mongoose.model('whatif'),
+	whatIfCrawler = require('../../crawlers/whatIfCrawler');
 
 var latestIndex = 157;
 
@@ -170,4 +171,9 @@ exports.what_if_list = function (req, res) {
 					res.json(docs);
 				}
 			});
+}
+
+exports.what_if_refresh = function (req, res) {
+	whatIfCrawler.regularCheck()
+	res.sendStatus(202)
 }
