@@ -100,11 +100,11 @@
 
 * **URL**
 
-/xkcd-random
+  /xkcd-random
 
 * **Method**
 
-`GET`
+  `GET`
 
 * **URL Params**
 
@@ -194,11 +194,11 @@
 
 * **URL**
 
-/what-if-random
+  /what-if-random
 
 * **Method**
 
-`GET`
+  `GET`
 
 * **URL Params**
 
