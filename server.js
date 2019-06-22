@@ -10,7 +10,14 @@ var	schedule = require('node-schedule'),
 	XkcdModel = require('./api/models/xkcdModel'),
 	WhatIfModel = require('./api/models/whatIfModel'),
 	xkcdCrawler = require('./crawlers/xkcdCrawler'),
-	whatIfCrawler = require('./crawlers/whatIfCrawler');
+    whatIfCrawler = require('./crawlers/whatIfCrawler');
+    
+const winston = require('winston');
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console()
+    ]
+});
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.db);
@@ -24,7 +31,9 @@ if (config.has("swagger-stats")) {
         name: swaggerConfig.name,
         uriPath: swaggerConfig.urlPath,
         onResponseFinish: function (req, res, rrr) {
-            debug('onResponseFinish: %s', JSON.stringify(rrr));
+            let log = JSON.stringify(rrr)
+            debug('onResponseFinish: %s', log);
+            logger.info(log)
         },
         authentication: true,
         sessionMaxAge: 900,

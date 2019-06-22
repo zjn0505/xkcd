@@ -177,3 +177,20 @@ exports.what_if_refresh = function (req, res) {
 	whatIfCrawler.regularCheck()
 	res.sendStatus(202)
 }
+
+exports.what_if_random = function (req, res) {
+	var size = parseInt(req.query.size);
+
+	if (!size) {
+		size = 1
+	}
+	WhatIf.aggregate()
+		.sample(size)
+		.then((comics) => {
+			res.json(comics)
+
+		}, (error) => {
+			res.error(error)
+			res.sendStatus(500)
+		})
+}

@@ -164,3 +164,20 @@ exports.xkcd_refresh = function (req, res) {
 	xkcdCrawler.regularCheck()
 	res.sendStatus(202)
 }
+
+exports.xkcd_random = function (req, res) {
+	var size = parseInt(req.query.size);
+
+	if (!size) {
+		size = 1
+	}
+	Xkcd.aggregate()
+		.sample(size)
+		.then((comics) => {
+			res.json(comics)
+
+		}, (error) => {
+			res.error(error)
+			res.sendStatus(500)
+		})
+}

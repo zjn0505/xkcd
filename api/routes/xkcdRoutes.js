@@ -23,4 +23,7 @@ exports.route = function(app) {
 
 	app.route('/xkcd-refresh')
 	.post(xkcdReqs.xkcd_refresh)
+
+	app.route('/xkcd-random')
+	.get(xkcdReqs.xkcd_random)
 };

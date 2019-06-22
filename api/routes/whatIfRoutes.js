@@ -23,4 +23,7 @@ exports.route = function(app) {
 
 	app.route('/what-if-refresh')
 	.post(whatIfReqs.what_if_refresh)
+
+	app.route('/what-if-random')
+	.get(whatIfReqs.what_if_random)
 };

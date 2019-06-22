@@ -8,8 +8,10 @@
 - [Get xkcd list with paging](#get-xkcd-list-with-paging)
 - [Give a thumb up to xkcd](#give-a-thumb-up-to-xkcd)
 - [Get top xkcds](#get-top-xkcds)
+- [Get random xkcd](#get-random-xkcd)
 - [Give a thumb up to what if](#give-a-thumb-up-to-what-if)
 - [Get top what ifs](#get-top-what-ifs)
+- [Get random what if](#get-random-what-if)
 
 ---
 ### Get xkcd search recommendation
@@ -259,6 +261,47 @@
 ```
 ----
 
+### Get  random xkcd
+
+* **URL**
+
+/xkcd-random
+
+* **Method**
+
+`GET`
+
+* **URL Params**
+
+| Name | Required | Type  | Description |
+| ---  | :---:    | ---   | ---         |
+| size |          |Integer| result size |
+
+* **Data Params**
+
+None
+
+* **Success Response**
+
+```json
+[
+{
+"width": 571,
+"height": 366,
+"thumbCount": 36,
+"num": 1983,
+"alt": "I found a copy of The Life-Changing Magic of Tidying Up, but the idea of reading it didn't spark joy, so I gave it away.",
+"title": "Clutter",
+"img": "https://imgs.xkcd.com/comics/clutter.png",
+"day": "20",
+"month": "4",
+"year": "2018"
+},
+...
+]
+```
+----
+
 ### Give a thumb up to what if
 
 * **URL**
@@ -324,5 +367,42 @@
         "num": 13
     },
     ...
+]
+```
+----
+
+### Get random what if
+
+* **URL**
+
+/what-if-random
+
+* **Method**
+
+`GET`
+
+* **URL Params**
+
+| Name | Required | Type  | Description |
+| ---  | :---:    | ---   | ---         |
+| size |          |Integer| result size |
+
+* **Data Params**
+
+None
+
+* **Success Response**
+
+```json
+[
+{
+"thumbCount": 7,
+"num": 144
+},
+{
+"thumbCount": 4,
+"num": 13
+},
+...
 ]
 ```
