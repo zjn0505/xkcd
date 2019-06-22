@@ -150,7 +150,7 @@
 | ---  | :---:    | ---   | ---         |
 | start|  *       |Integer| start index, starts from 0, 0 means the last item |
 |reversed|        |Integer| 0 not reversed, 1 reversed, default `0` |
-| size |          |Integer| size of xkcd list, default `100` |
+| size |          |Integer| size of what if list, default `100` |
 
 
 -------------------------------------------------
