@@ -1,6 +1,6 @@
 const xkcdUrl = 'https://xkcd.com/info.0.json';
-const specialXkcds = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
-const specialXkcdsFallback = 'https://rawgit.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
+const specialXkcds = 'https://zjn0505.github.io/Xkcd-Android/xkcd_special.json';
+const specialXkcdsFallback = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 
 
 var sizeOf = require('image-size'),
