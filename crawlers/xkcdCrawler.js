@@ -98,7 +98,9 @@ function queryAndAddToMongo(id) {
 		});
 	}).catch(function(err) {
 		console.error("Query xkcd failed " + id);
-		throw err;
+		if (id != 404) {
+			throw err;
+		}
 	});
 }
 
