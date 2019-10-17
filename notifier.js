@@ -1,15 +1,13 @@
 const fcmServerKey = process.env.XKCD_FCM_KEY || "000";
 const serverChanKey = process.env.SERVER_CHAN_KEY || "000";
-const pushBearKey = process.env.PUSH_BEAR_KEY || "000";
 
 var serverChanUrl = 'https://sc.ftqq.com/' + serverChanKey + '.send';
-var pushBearUrl = 'https://pushbear.ftqq.com/sub?sendkey=' + pushBearKey;
 
 var rp = require('request-promise-native'),
 	FCM = require('fcm-push'),
 	fcm = new FCM(fcmServerKey);
 
-if (fcmServerKey == "000" || serverChanKey == "000" || pushBearKey == "000") {
+if (fcmServerKey == "000" || serverChanKey == "000") {
 	console.error("Invalid key initialzation");
 }
 
@@ -63,10 +61,10 @@ exports.newWhatIfForFCM = function (article) {
 	});
 }
 
-exports.newComicsForFtqq = function (comics, service) {
+exports.newComicsForFtqq = function (comics) {
 	var options = {
 		method: 'POST',
-		url: service == "serverChan" ? serverChanUrl : pushBearUrl,
+		url: serverChanUrl,
 		form: {
 			text: 'xkcd-' + comics.num + '-is-on-the-way',
 			desp: '```json\n' + JSON.stringify(comics, null, 4) + '\n```\n[![comics](' + comics.img + ')](' + comics.img + ')'
@@ -82,11 +80,11 @@ exports.newComicsForFtqq = function (comics, service) {
 	});
 }
 
-exports.newWhatIfForFtqq = function (article, service) {
+exports.newWhatIfForFtqq = function (article) {
 	console.log("sending ... " + article)
 	var options = {
 		method: 'POST',
-		url: service == "serverChan" ? serverChanUrl : pushBearUrl,
+		url: serverChanUrl,
 		form: {
 			text: 'what-if-' + article.num + '-is-on-the-way',
 			desp: article.title + '\n https://whatif.xkcd.com/' + article.num

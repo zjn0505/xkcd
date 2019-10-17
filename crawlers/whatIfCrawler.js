@@ -35,8 +35,7 @@ exports.regularCheck = function() {
 		} else {
 			return Promise.reject("");
 		}      
-	}).then(function(article) { return notifier.newWhatIfForFtqq(article, "serverChan"); })
-	.then(function(article) { return notifier.newWhatIfForFtqq(article, "pushBear"); })
+	}).then(function(article) { return notifier.newWhatIfForFtqq(article); })
 	.catch(function(err) {
 		console.log(err);
 	})

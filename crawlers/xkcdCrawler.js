@@ -50,8 +50,7 @@ exports.regularCheck = function() {
 		} else {
 			return Promise.reject("");
 		}      
-	}).then(function(comics) { return notifier.newComicsForFtqq(comics, "serverChan"); })
-	.then(function(comics) { return notifier.newComicsForFtqq(comics, "pushBear"); })
+	}).then(function(comics) { return notifier.newComicsForFtqq(comics); })
 	.catch(function(err) {
 		console.log(err);
 	})
