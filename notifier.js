@@ -1,64 +1,66 @@
-const fcmServerKey = process.env.XKCD_FCM_KEY || "000";
-const serverChanKey = process.env.SERVER_CHAN_KEY || "000";
-
-var serverChanUrl = 'https://sc.ftqq.com/' + serverChanKey + '.send';
-
 var rp = require('request-promise-native'),
-	FCM = require('fcm-push'),
-	fcm = new FCM(fcmServerKey);
+	admin = require('firebase-admin'),
+	config = require('config');
 
-if (fcmServerKey == "000" || serverChanKey == "000") {
-	console.error("Invalid key initialzation");
-}
+admin.initializeApp({
+	credential: admin.credential.cert(config.fcm.serviceAccount),
+	databaseURL: config.fcm.databaseURL
+});
+
+var fcm = admin.messaging();
+
+
+var testToken = "f-ca6HW5uNc:APA91bG2fWDN-RZ3P564ul_8xZUQ6qyCH1WCNGef2u6o7lkObqNjJfJDF5kv-WGYl2-osmJ3DvH6Lfan6M3VXGELp3YHLpkkTEZhktcfXOq7P85KYUE4_vEXAzIlxHoHbyWuSbjCgjkl"
+
+
+var serverChanUrl = 'https://sc.ftqq.com/' + config.serverChanKey + '.send';
 
 exports.newComicsForFCM = function (xkcd) {
+	console.log(xkcd)
 	var message = {
-		to: '/topics/new_comics',
-		collapse_key: 'new_comics',
 		data: {
-			xkcd: xkcd
+			xkcd: JSON.stringify(xkcd)
+		}
+	};
+	var options = {
+		priority: "high",
+		timeToLive: 60 * 60 * 24 * 2,
+		fcmOptions: {
+			analyticsLabel : `${xkcd.num}`
 		},
 		android: {
-			ttl: "172800s",
-			"priority": "high"
-		},
-		fcm_options: {
-			"analytics_label": xkcd.num
-		},
-		time_to_live: 172800
-	};
-	fcm.send(message, function (err, response) {
-		if (err) {
-			console.log("FCM Something has gone wrong! " + err);
-		} else {
-			console.log("FCM Successfully sent with response: ", response);
+			collapseKey: "new_comics"
 		}
-	});
+	};
+	console.log("sendMessage")
+	fcm.sendToTopic("new_comics", message, options)
+		.then(JSON.stringify)
+		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
+		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
 }
 
 exports.newWhatIfForFCM = function (article) {
+	console.log(article)
 	var message = {
-		to: '/topics/new_what_if',
-		collapse_key: 'new_what_if',
 		data: {
-			whatif: article
+			whatif: JSON.stringify(article)
+		}
+	};
+	var options = {
+		priority: "high",
+		timeToLive: 60 * 60 * 24 * 7 * 4,
+		fcmOptions: {
+			analyticsLabel : `${article.num}`
 		},
 		android: {
-			ttl: "172800s",
-			"priority": "high"
-		},
-		fcm_options: {
-			"analytics_label": article.num
-		},
-		time_to_live: 172800
-	};
-	fcm.send(message, function (err, response) {
-		if (err) {
-			console.log("FCM Something has gone wrong! " + err);
-		} else {
-			console.log("FCM Successfully sent with response: ", response);
+			collapseKey: "new_what_if"
 		}
-	});
+	};
+	console.log("sendMessage")
+	fcm.sendToTopic("new_what_if", message, options)
+		.then(JSON.stringify)
+		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
+		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
 }
 
 exports.newComicsForFtqq = function (comics) {
