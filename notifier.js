@@ -18,22 +18,35 @@ var serverChanUrl = 'https://sc.ftqq.com/' + config.serverChanKey + '.send';
 exports.newComicsForFCM = function (xkcd) {
 	console.log(xkcd)
 	var message = {
+		topic: "new_comicss",
 		data: {
 			xkcd: JSON.stringify(xkcd)
-		}
+		},
+		android: {
+			collapse_key: "new_comics",
+			priority: "high",
+			ttl: 60 * 60 * 24 * 2 * 1000,
+			fcm_options: {
+				analytics_label: `${xkcd.num}-Android`
+			},
+		},
+		fcm_options: {
+			analytics_label: `${xkcd.num}`
+		},
 	};
 	var options = {
 		priority: "high",
 		timeToLive: 60 * 60 * 24 * 2,
 		fcmOptions: {
-			analyticsLabel : `${xkcd.num}`
+			analyticsLabel: `${xkcd.num}`
 		},
 		android: {
 			collapseKey: "new_comics"
 		}
 	};
 	console.log("sendMessage")
-	fcm.sendToTopic("new_comics", message, options)
+	fcm.send(message)
+	// fcm.sendToDevice("new_comics", message, options)
 		.then(JSON.stringify)
 		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
 		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
@@ -50,7 +63,7 @@ exports.newWhatIfForFCM = function (article) {
 		priority: "high",
 		timeToLive: 60 * 60 * 24 * 7 * 4,
 		fcmOptions: {
-			analyticsLabel : `${article.num}`
+			analyticsLabel: `${article.num}`
 		},
 		android: {
 			collapseKey: "new_what_if"
