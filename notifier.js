@@ -18,7 +18,7 @@ var serverChanUrl = 'https://sc.ftqq.com/' + config.serverChanKey + '.send';
 exports.newComicsForFCM = function (xkcd) {
 	console.log(xkcd)
 	var message = {
-		topic: "new_comicss",
+		topic: "new_comics",
 		data: {
 			xkcd: JSON.stringify(xkcd)
 		},
@@ -34,19 +34,8 @@ exports.newComicsForFCM = function (xkcd) {
 			analytics_label: `${xkcd.num}`
 		},
 	};
-	var options = {
-		priority: "high",
-		timeToLive: 60 * 60 * 24 * 2,
-		fcmOptions: {
-			analyticsLabel: `${xkcd.num}`
-		},
-		android: {
-			collapseKey: "new_comics"
-		}
-	};
 	console.log("sendMessage")
 	fcm.send(message)
-	// fcm.sendToDevice("new_comics", message, options)
 		.then(JSON.stringify)
 		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
 		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
@@ -55,22 +44,24 @@ exports.newComicsForFCM = function (xkcd) {
 exports.newWhatIfForFCM = function (article) {
 	console.log(article)
 	var message = {
+		topic: "new_what_if",
 		data: {
 			whatif: JSON.stringify(article)
-		}
-	};
-	var options = {
-		priority: "high",
-		timeToLive: 60 * 60 * 24 * 7 * 4,
-		fcmOptions: {
-			analyticsLabel: `${article.num}`
 		},
 		android: {
-			collapseKey: "new_what_if"
-		}
+			collapse_key: "new_comics",
+			priority: "high",
+			ttl: 60 * 60 * 24 * 7 * 4 * 1000,
+			fcm_options: {
+				analytics_label: `${article.num}-Android`
+			},
+		},
+		fcm_options: {
+			analytics_label: `${article.num}`
+		},
 	};
 	console.log("sendMessage")
-	fcm.sendToTopic("new_what_if", message, options)
+	fcm.send(message)
 		.then(JSON.stringify)
 		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
 		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))

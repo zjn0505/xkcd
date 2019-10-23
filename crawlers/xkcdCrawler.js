@@ -20,8 +20,6 @@ exports.getLatest = function() {
 	rp(xkcdUrl).then(JSON.parse).then(function(latestComic) {
 		latestIndex = latestComic.num;
 		routes.setLatest(latestIndex);
-
-		notifier.newComicsForFCM(latestComic);
 		console.log("init xkcd and the latest is " + latestIndex);
 	}).then(function() {
 		return rp({ url: specialXkcds, simple: true }).catch(function(err) {
