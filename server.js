@@ -5,6 +5,7 @@ var	schedule = require('node-schedule'),
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	app = express(),
+    compression = require('compression')
 	port = config.port,
 	swStats = require('swagger-stats'),
 	XkcdModel = require('./api/models/xkcdModel'),
@@ -29,6 +30,7 @@ mongoose.connect(config.db, {
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use(compression())
 
 if (config.has("swagger-stats")) {
     var swaggerConfig = config.get("swagger-stats");
