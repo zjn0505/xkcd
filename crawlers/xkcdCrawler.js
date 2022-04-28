@@ -1,6 +1,6 @@
 const xkcdUrl = 'https://xkcd.com/info.0.json';
-const specialXkcds = 'https://zjn0505.github.io/Xkcd-Android/xkcd_special.json';
-const specialXkcdsFallback = 'https://raw.githubusercontent.com/zjn0505/Xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
+const specialXkcds = 'https://zjn0505.github.io/xkcd-Android/xkcd_special.json';
+const specialXkcdsFallback = 'https://raw.githubusercontent.com/zjn0505/xkcd-Android/master/xkcd/src/main/res/raw/xkcd_special.json';
 
 
 var sizeOf = require('image-size'),
@@ -70,6 +70,7 @@ function getXkcdFullInfo(id) {
 
 function queryAndAddToMongo(id) {
 	var url = 'https://xkcd.com/' + id + '/info.0.json';
+	console.log(url)
 	return rp({ url: url, simple: true }).then(function(body) {
 		var comics;
 		try {
@@ -93,16 +94,19 @@ function queryAndAddToMongo(id) {
 		}
 		return comics;
 	}).then(getComicsWithSize).then(function(fullXkcd) {
+		console.log(fullXkcd)
 		return fullXkcd.save().then(function(xkcdSaved) {
 			return xkcdSaved;
 		});
 	}).catch(function(err) {
-		console.error("Query xkcd failed " + id);
+		console.error("Query xkcd failed " + id + " err " + err);
 		if (id != 404) {
 			throw err;
 		}
 	});
 }
+
+exports.queryAndAddToMongo = queryAndAddToMongo
 
 function getComicsWithSize(comics) {
 	return rp({ url: comics.img, encoding: null}).then(function(body) {

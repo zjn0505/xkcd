@@ -161,8 +161,19 @@ exports.xkcd_top = function (req, res) {
 }
 
 exports.xkcd_refresh = function (req, res) {
-	xkcdCrawler.regularCheck()
-	res.sendStatus(202)
+	var index = req.query.num;
+	if (isNaN(index)) {
+		index = 0
+		xkcdCrawler.regularCheck()
+		res.sendStatus(202)
+	} else {
+		xkcdCrawler.queryAndAddToMongo(index)
+			.then((comics) => {
+				res.json(comics)
+			}).catch((error) => {
+				res.sendStatus(500)
+			});
+	}
 }
 
 exports.xkcd_random = function (req, res) {
@@ -177,7 +188,7 @@ exports.xkcd_random = function (req, res) {
 			res.json(comics)
 
 		}, (error) => {
-			res.error(error)
+			// res.error(error)
 			res.sendStatus(500)
 		})
 }
