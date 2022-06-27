@@ -46,7 +46,7 @@ exports.regularCheck = function () {
 function parseLatest(html) {
 	var article = {};
 	var $ = cheerio.load(html)
-	article.num = parseInt($("section#entry-wrapper a:first-child").attr("href").split("/")[3]);
+	article.num = parseInt($("section#entry-wrapper a:first-child").attr("href").split("/")[3]) + 1;
 	article.title = $("section#entry-wrapper h2#title a").html();
 	return article;
 }
