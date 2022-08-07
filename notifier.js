@@ -2,12 +2,17 @@ var rp = require('request-promise-native'),
 	admin = require('firebase-admin'),
 	config = require('config');
 
-admin.initializeApp({
-	credential: admin.credential.cert(config.fcm.serviceAccount),
-	databaseURL: config.fcm.databaseURL
-});
 
-var fcm = admin.messaging();
+var fcm = undefined;
+
+if (config.has("fcm")) {
+	admin.initializeApp({
+		credential: admin.credential.cert(config.fcm.serviceAccount),
+		databaseURL: config.fcm.databaseURL
+	});
+	fcm = admin.messaging();
+}
+
 
 
 var testToken = "f-ca6HW5uNc:APA91bG2fWDN-RZ3P564ul_8xZUQ6qyCH1WCNGef2u6o7lkObqNjJfJDF5kv-WGYl2-osmJ3DvH6Lfan6M3VXGELp3YHLpkkTEZhktcfXOq7P85KYUE4_vEXAzIlxHoHbyWuSbjCgjkl"
@@ -35,10 +40,12 @@ exports.newComicsForFCM = function (xkcd) {
 		},
 	};
 	console.log("sendMessage")
-	fcm.send(message)
-		.then(JSON.stringify)
-		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
-		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
+	if (fcm) {
+		fcm.send(message)
+			.then(JSON.stringify)
+			.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
+			.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
+	}
 }
 
 exports.newWhatIfForFCM = function (article) {
@@ -61,10 +68,12 @@ exports.newWhatIfForFCM = function (article) {
 		},
 	};
 	console.log("sendMessage")
-	fcm.send(message)
-		.then(JSON.stringify)
-		.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
-		.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
+	if (fcm) {
+		fcm.send(message)
+			.then(JSON.stringify)
+			.then(resp => console.log(`FCM Successfully sent with response: ${resp}`))
+			.catch(e => console.error(`FCM Something has gone wrong! ${e}`))
+	}
 }
 
 exports.newComicsForFtqq = function (comics) {

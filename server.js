@@ -22,10 +22,6 @@ const logger = winston.createLogger({
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.db, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false
 })
 
 app.use(bodyParser.urlencoded({extended:true}));
