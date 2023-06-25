@@ -12,58 +12,54 @@ var specials, Xkcd;
 
 latestIndex = routes.latestIndex;
 
-exports.register = function(xkcd) {
+exports.register = (xkcd) => {
 	Xkcd = xkcd;
 }
 
-exports.getLatest = function() {
-	rp(xkcdUrl).then(JSON.parse).then(function(latestComic) {
+exports.getLatest = () => {
+	rp(xkcdUrl).then(JSON.parse).then((latestComic) => {
 		latestIndex = latestComic.num;
 		routes.setLatest(latestIndex);
 		console.log("init xkcd and the latest is " + latestIndex);
-	}).then(function() {
-		return rp({ url: specialXkcds, simple: true }).catch(function(err) {
-			console.log("Use special xkcds fallback");
-			return rp(specialXkcdsFallback);
-		}); 
-	}).then(JSON.parse).then(function(specialsResp) {
+	}).then(() => rp({ url: specialXkcds, simple: true }).catch((err) => {
+		console.log("Use special xkcds fallback");
+		return rp(specialXkcdsFallback);
+	})).then(JSON.parse).then((specialsResp) => {
 		specials = specialsResp;
 		console.log("init and the specials length is " + specials.length);
 		return ids = range(1, latestIndex);
-	}).then(function(ids) {
-		return Promise.all(ids.map(getXkcdFullInfo));
-	}).catch(function(err) {
+	}).then((ids) => Promise.all(ids.map(getXkcdFullInfo))).catch((err) => {
 		console.error("init xkcd Mongo failed " + err);
 	});
 }
 
-exports.regularCheck = function() {
+exports.regularCheck = () => {
 	console.log("xkcd regular check, current index is " + latestIndex);
-	rp(xkcdUrl).then(JSON.parse).then(function(comics) {
+	rp(xkcdUrl).then(JSON.parse).then((comics) => {
 		if (comics.num > latestIndex && specials) {
 			latestIndex = comics.num;
 			routes.setLatest(latestIndex);
 			getXkcdFullInfo(latestIndex);
 			notifier.newComicsForFCM(comics);
 			console.log("new comics detected, id: " + comics.num);
-			return(comics);
+			return (comics);
 		} else {
 			return Promise.reject("");
-		}      
-	}).then(function(comics) { return notifier.newComicsForFtqq(comics); })
-	.catch(function(err) {
-		console.log(err);
-	})
+		}
+	}).then((comics) => notifier.newComicsForFtqq(comics))
+		.catch((err) => {
+			console.log(err);
+		});
 }
 
 function getXkcdFullInfo(id) {
-	return Xkcd.findOne({'num' : id}).exec().then(function(doc) {
+	return Xkcd.findOne({'num' : id}).exec().then((doc) => {
 		if (!doc || !doc.width || !doc.height) {
 			return queryAndAddToMongo(id);
 		} else {
 			return doc;
 		}
-	}).catch(function(err) {
+	}).catch((err) => {
 		throw err;
 	});
 }
@@ -71,7 +67,7 @@ function getXkcdFullInfo(id) {
 function queryAndAddToMongo(id) {
 	var url = 'https://xkcd.com/' + id + '/info.0.json';
 	console.log(url)
-	return rp({ url: url, simple: true }).then(function(body) {
+	return rp({ url: url, simple: true }).then((body) => {
 		var comics;
 		try {
 			comics = JSON.parse(body);
@@ -93,12 +89,10 @@ function queryAndAddToMongo(id) {
 			}
 		}
 		return comics;
-	}).then(getComicsWithSize).then(function(fullXkcd) {
-		console.log(fullXkcd)
-		return fullXkcd.save().then(function(xkcdSaved) {
-			return xkcdSaved;
-		});
-	}).catch(function(err) {
+	}).then(getComicsWithSize).then((fullXkcd) => {
+		console.log(fullXkcd);
+		return fullXkcd.save().then((xkcdSaved) => xkcdSaved);
+	}).catch((err) => {
 		console.error("Query xkcd failed " + id + " err " + err);
 		if (id != 404) {
 			throw err;
@@ -109,7 +103,7 @@ function queryAndAddToMongo(id) {
 exports.queryAndAddToMongo = queryAndAddToMongo
 
 function getComicsWithSize(comics) {
-	return rp({ url: comics.img, encoding: null}).then(function(body) {
+	return rp({ url: comics.img, encoding: null}).then((body) => {
 		if (!body) {
 			throw "Download image failed: " + comics.num;
 		}
@@ -117,7 +111,7 @@ function getComicsWithSize(comics) {
 		try {
 			dimens = sizeOf(body);
 		} catch (sizeError) {
-			throw "Invalid img " + comics.num + " " + comics.img
+			throw "Invalid img " + comics.num + " " + comics.img;
 		}
 		return new Xkcd({
 			num: comics.num,
@@ -131,9 +125,9 @@ function getComicsWithSize(comics) {
 			width: dimens.width,
 			height: dimens.height
 		});
-	}).catch(function(err) {
+	}).catch((err) => {
 		console.error("get xkcd size failed " + comics.num + " " + comics.img);
-		throw err ;
+		throw err;
 	});
 }
 
@@ -142,7 +136,5 @@ function range(start, end, step, offset) {
 	var direction = start < end ? 1 : -1;
 	var startingPoint = start - (direction * (offset || 0));
 	var stepSize = direction * (step || 1);
-	return Array(len).fill(0).map(function(_, index) {
-		return startingPoint + (stepSize * index);
-	});
+	return Array(len).fill(0).map((_, index) => startingPoint + (stepSize * index));
 }
